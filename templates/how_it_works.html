@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How It Works – WebTrust</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="brand-logo">
+        <a href="{{ url_for('home') }}" style="color: inherit;"><span>🛡️ WebTrust</span></a>
+        <span class="brand-badge">Passive Trust Scanner</span>
+      </div>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('how_it_works') }}" class="nav-link active">How It Works</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link">Scan History</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top: 40px; padding-bottom: 60px;">
+    
+    <header style="text-align: center; margin-bottom: 40px;">
+      <div class="hero-pill">
+        <span>Transparent Architecture</span>
+      </div>
+      <h1 class="hero-title">How WebTrust Works</h1>
+      <p class="hero-subtitle">
+        A step-by-step walkthrough of the passive trust analysis pipeline, built for students and educators.
+      </p>
+    </header>
+
+    <!-- Pipeline Steps Container -->
+    <div class="pipeline-container">
+      
+      <!-- Step 1 -->
+      <div class="pipeline-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>User Enters Website URL</h3>
+          <p>
+            The user inputs a target URL into the web interface. WebTrust normalizes the URL (ensuring proper protocol formatting like <code>https://</code>) and validates the domain syntax before making any network connections.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="pipeline-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Python Collects Website Information (Passive HTTP)</h3>
+          <p>
+            Using the Python <code>requests</code> library, WebTrust makes a standard, safe <code>GET</code> request with a 7-second timeout. It measures response time, observes redirects, captures the HTTP status code, and inspects server response headers.
+          </p>
+          <p style="margin-top: 8px; color: var(--accent-cyan); font-size: 0.85rem;">
+            🔒 <strong>Safety Guarantee:</strong> WebTrust never performs brute-forcing, injection, port scanning, or intrusive testing.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="pipeline-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Python Checks Trust Signals</h3>
+          <p>
+            Using <code>BeautifulSoup</code> and URL parsing routines:
+          </p>
+          <ul style="margin-left: 20px; margin-top: 6px; color: var(--text-secondary); font-size: 0.9rem;">
+            <li><strong>URL Heuristics:</strong> Checks length, IP addresses vs domains, excessive hyphens, and suspicious keywords.</li>
+            <li><strong>Content Analysis:</strong> Counts hyperlinks, form elements, and presence of password fields.</li>
+            <li><strong>Trust Pages:</strong> Searches for links pointing to Privacy Policy, About Us, Terms of Service, and Contact info.</li>
+            <li><strong>Security Headers:</strong> Audits defensive headers like HSTS, CSP, X-Frame-Options, and X-Content-Type-Options.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="pipeline-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h3>Python Calculates Risk Score (0 – 100)</h3>
+          <p>
+            In <code>risk_score.py</code>, a transparent rule engine aggregates risk points. The score ranges from <strong>0 (very few risk indicators)</strong> to <strong>100 (many risk indicators)</strong>:
+          </p>
+          <div style="display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap;">
+            <div class="verdict-tag trustworthy">0 – 29: Likely Trustworthy</div>
+            <div class="verdict-tag caution">30 – 65: Needs Caution</div>
+            <div class="verdict-tag high-risk">66 – 100: High Risk Indicators</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="pipeline-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h3>Python Generates Matplotlib Graphs</h3>
+          <p>
+            Server-side Python code in <code>graph.py</code> uses <strong>Matplotlib</strong> (headless <code>Agg</code> backend) to create three high-resolution charts:
+          </p>
+          <ul style="margin-left: 20px; margin-top: 6px; color: var(--text-secondary); font-size: 0.9rem;">
+            <li><strong>Graph 1 – Risk Breakdown:</strong> A horizontal bar chart of category risk points.</li>
+            <li><strong>Graph 2 – Trust Signals:</strong> A donut/pie chart of Positive vs Warning vs Risk signals.</li>
+            <li><strong>Graph 3 – Scan History:</strong> A line chart tracking risk scores over past scans.</li>
+          </ul>
+          <p style="margin-top: 8px; color: var(--text-muted); font-size: 0.85rem;">
+            * Zero client-side JavaScript is used; images are rendered directly on the server as PNG files.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="pipeline-step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <h3>Flask Displays Report & Generates Download</h3>
+          <p>
+            The Flask controller renders <code>result.html</code> containing the comprehensive visual dashboard, saves the scan entry to <code>scan_history.json</code>, and writes a detailed text report file in <code>reports/</code> for the user to download.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Back to Home Button -->
+    <div style="text-align: center; margin-top: 36px;">
+      <a href="{{ url_for('home') }}" class="btn-primary">
+        🚀 Try Analyzing a Website
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>WebTrust – Educational Website Trust & Risk Analyzer | Built with Python, Flask, and Matplotlib</p>
+    </div>
+  </footer>
+
+</body>
+</html>

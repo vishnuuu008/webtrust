@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan History – WebTrust</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="brand-logo">
+        <a href="{{ url_for('home') }}" style="color: inherit;"><span>🛡️ WebTrust</span></a>
+        <span class="brand-badge">Passive Trust Scanner</span>
+      </div>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('how_it_works') }}" class="nav-link">How It Works</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link active">Scan History</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top: 40px; padding-bottom: 60px;">
+    
+    <header style="text-align: center; margin-bottom: 36px;">
+      <div class="hero-pill">
+        <span>Persistent Local Storage</span>
+      </div>
+      <h1 class="hero-title">Website Scan History</h1>
+      <p class="hero-subtitle">
+        Review previous website assessments stored safely in <code>scan_history.json</code>.
+      </p>
+    </header>
+
+    <!-- Historical Chart -->
+    <section class="graph-card" style="margin-bottom: 36px;">
+      <h2 style="font-size: 1.15rem; margin-bottom: 16px; color: var(--accent-cyan);">
+        📈 Risk Trend of Recent Scans (Python Matplotlib)
+      </h2>
+      <img src="{{ url_for('static', filename=history_chart) }}" alt="Historical Scan Trend" class="graph-img">
+    </section>
+
+    <!-- Scan History Table -->
+    <section class="history-table-container">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Website Domain</th>
+            <th>Risk Score</th>
+            <th>Overall Result</th>
+            <th>Date & Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in records %}
+            <tr>
+              <td style="font-family: monospace; font-weight: 600; color: var(--text-primary);">
+                {{ item.website }}
+              </td>
+              <td>
+                <span style="font-weight: 700; font-size: 1.1rem; color: {% if item.risk_score < 30 %}var(--color-trustworthy){% elif item.risk_score <= 65 %}var(--color-caution){% else %}var(--color-risk){% endif %};">
+                  {{ item.risk_score }}
+                </span>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">/ 100</span>
+              </td>
+              <td>
+                <span class="verdict-tag {% if item.risk_score < 30 %}trustworthy{% elif item.risk_score <= 65 %}caution{% else %}high-risk{% endif %}" style="font-size: 0.82rem; padding: 4px 12px;">
+                  {{ item.result }}
+                </span>
+              </td>
+              <td style="color: var(--text-secondary); font-size: 0.88rem;">
+                {{ item.date }}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                No scan history records found yet. Try scanning a website from the home page!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Action Buttons -->
+    <div class="actions-bar">
+      <a href="{{ url_for('home') }}" class="btn-primary">
+        🔍 Analyze New Website
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>WebTrust – Educational Website Trust & Risk Analyzer | Built with Python, Flask, and Matplotlib</p>
+    </div>
+  </footer>
+
+</body>
+</html>

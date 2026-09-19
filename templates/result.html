@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment: {{ analysis.url_data.domain }} – WebTrust</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="brand-logo">
+        <a href="{{ url_for('home') }}" style="color: inherit;"><span>🛡️ WebTrust</span></a>
+        <span class="brand-badge">Passive Trust Scanner</span>
+      </div>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('how_it_works') }}" class="nav-link">How It Works</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link">Scan History</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Result Dashboard Container -->
+  <main class="container">
+
+    <!-- Header / Verdict Banner -->
+    <header class="result-header">
+      <div class="result-banner">
+        <div class="result-info">
+          <div class="scan-date">Scanned on: {{ analysis.scan_time }}</div>
+          <h1>{{ analysis.url_data.domain }}</h1>
+          <p style="color: var(--text-secondary); margin-bottom: 14px; font-family: monospace; font-size: 0.95rem;">
+            {{ analysis.url_data.url }}
+          </p>
+          <div>
+            <span class="verdict-tag {{ risk.verdict_badge }}">
+              {{ risk.verdict }}
+            </span>
+          </div>
+          <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;">
+            {{ risk.summary }}
+          </p>
+        </div>
+
+        <!-- Risk Score Number Display -->
+        <div class="score-box">
+          <div class="score-number {{ risk.verdict_badge }}">
+            {{ risk.score }}
+          </div>
+          <div class="score-label">Risk Score / 100</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">(0 = Safer, 100 = Higher Risk)</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Why did we get this result? -->
+    <section class="explanation-card">
+      <h2 class="card-title">💡 Why did we get this result?</h2>
+      <div class="signals-list">
+        
+        <!-- Positive Signals -->
+        {% for sig in risk.positive_signals %}
+          <div class="signal-item positive">
+            <span class="signal-icon">✓</span>
+            <span>{{ sig }}</span>
+          </div>
+        {% endfor %}
+
+        <!-- Warning Signals -->
+        {% for sig in risk.warning_signals %}
+          <div class="signal-item warning">
+            <span class="signal-icon">⚠</span>
+            <span>{{ sig }}</span>
+          </div>
+        {% endfor %}
+
+        <!-- High Risk Signals -->
+        {% for sig in risk.risk_signals %}
+          <div class="signal-item risk">
+            <span class="signal-icon">✕</span>
+            <span>{{ sig }}</span>
+          </div>
+        {% endfor %}
+
+      </div>
+    </section>
+
+    <!-- Python-Generated Matplotlib Graphs Section -->
+    <section class="graphs-section">
+      <h2 class="section-heading">📊 Visual Risk Analytics (Generated with Python Matplotlib)</h2>
+      
+      <div class="graphs-grid">
+        <!-- Graph 1: Risk Breakdown Bar Chart -->
+        <div class="graph-card">
+          <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--accent-cyan);">Graph 1: Risk Contribution Breakdown</h3>
+          <img src="{{ url_for('static', filename=charts.breakdown_chart) }}" alt="Risk Breakdown Bar Chart" class="graph-img">
+        </div>
+
+        <!-- Graph 2: Trust Signals Pie Chart -->
+        <div class="graph-card">
+          <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--accent-cyan);">Graph 2: Trust Signal Distribution</h3>
+          <img src="{{ url_for('static', filename=charts.signals_chart) }}" alt="Trust Signals Pie Chart" class="graph-img">
+        </div>
+
+        <!-- Graph 3: Scan History Line Chart (Full Width) -->
+        <div class="graph-card full-width">
+          <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--accent-cyan);">Graph 3: Historical Scans & Risk Trend</h3>
+          <img src="{{ url_for('static', filename=charts.history_chart) }}" alt="Scan History Line Chart" class="graph-img">
+        </div>
+      </div>
+    </section>
+
+    <!-- Security Check Cards -->
+    <section>
+      <h2 class="section-heading">🛡️ Security Check Cards</h2>
+      <div class="cards-grid">
+        
+        <!-- Card 1: HTTPS -->
+        <div class="check-card">
+          <div class="check-card-header">
+            <span class="check-card-title">HTTPS Encryption</span>
+            {% if analysis.url_data.is_https and not ('SSL' in (analysis.error_message or '')) %}
+              <span class="status-badge good">✓ Good</span>
+            {% else %}
+              <span class="status-badge risk">✕ Risk</span>
+            {% endif %}
+          </div>
+          <p class="check-card-desc">
+            {% if analysis.url_data.is_https %}
+              HTTPS is enabled. Network traffic is encrypted with SSL/TLS.
+            {% else %}
+              HTTPS is NOT enabled. Plaintext HTTP traffic can be intercepted.
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Card 2: URL Structure -->
+        <div class="check-card">
+          <div class="check-card-header">
+            <span class="check-card-title">URL Structure</span>
+            {% if not analysis.url_data.is_long_url and not analysis.url_data.has_at_symbol and not analysis.url_data.found_keywords %}
+              <span class="status-badge good">✓ Good</span>
+            {% else %}
+              <span class="status-badge warning">⚠ Warning</span>
+            {% endif %}
+          </div>
+          <p class="check-card-desc">
+            {% if not analysis.url_data.is_long_url and not analysis.url_data.has_at_symbol and not analysis.url_data.found_keywords %}
+              The URL has a standard, concise structure with no suspicious indicators.
+            {% else %}
+              Unusual structure: length {{ analysis.url_data.url_length }} chars, 
+              {% if analysis.url_data.found_keywords %}keywords detected: {{ analysis.url_data.found_keywords | join(', ') }}{% endif %}
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Card 3: Domain & Host Type -->
+        <div class="check-card">
+          <div class="check-card-header">
+            <span class="check-card-title">Domain / IP Check</span>
+            {% if not analysis.url_data.is_ip_address and not analysis.url_data.excessive_subdomains %}
+              <span class="status-badge good">✓ Good</span>
+            {% elif analysis.url_data.is_ip_address %}
+              <span class="status-badge risk">✕ Risk</span>
+            {% else %}
+              <span class="status-badge warning">⚠ Warning</span>
+            {% endif %}
+          </div>
+          <p class="check-card-desc">
+            {% if analysis.url_data.is_ip_address %}
+              Warning: Direct IP address is used instead of a registered domain name.
+            {% elif analysis.url_data.excessive_subdomains %}
+              Notice: Domain contains {{ analysis.url_data.subdomain_count }} subdomains, which may be complex.
+            {% else %}
+              Standard domain name registered and detected.
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Card 4: Redirects -->
+        <div class="check-card">
+          <div class="check-card-header">
+            <span class="check-card-title">Redirects</span>
+            {% if analysis.redirect_count <= 2 %}
+              <span class="status-badge good">✓ Good</span>
+            {% else %}
+              <span class="status-badge warning">⚠ Warning</span>
+            {% endif %}
+          </div>
+          <p class="check-card-desc">
+            {% if analysis.redirect_count == 0 %}
+              No redirects detected. Direct server connection.
+            {% elif analysis.redirect_count <= 2 %}
+              Normal redirect chain ({{ analysis.redirect_count }} hop(s)).
+            {% else %}
+              Unusual redirect chain detected ({{ analysis.redirect_count }} hops).
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Card 5: Privacy Policy -->
+        <div class="check-card">
+          <div class="check-card-header">
+            <span class="check-card-title">Privacy Policy</span>
+            {% if analysis.trust_pages.privacy %}
+              <span class="status-badge good">✓ Good</span>
+            {% else %}
+              <span class="status-badge warning">⚠ Warning</span>
+            {% endif %}
+          </div>
+          <p class="check-card-desc">
+            {% if analysis.trust_pages.privacy %}
+              Privacy policy link was detected on the webpage.
+            {% else %}
+              Privacy policy link was not detected on the homepage.
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Card 6: Security Headers -->
+        <div class="check-card">
+          <div class="check-card-header">
+            <span class="check-card-title">Security Headers</span>
+            {% if analysis.security_headers.hsts and (analysis.security_headers.x_frame_options or analysis.security_headers.csp) %}
+              <span class="status-badge good">✓ Good</span>
+            {% else %}
+              <span class="status-badge warning">⚠ Warning</span>
+            {% endif %}
+          </div>
+          <p class="check-card-desc">
+            {% if analysis.security_headers.hsts and analysis.security_headers.csp %}
+              Strong security headers (HSTS & CSP) are configured.
+            {% else %}
+              Some recommended security headers (such as HSTS or CSP) were not detected.
+            {% endif %}
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Technical Details & Trust Pages Table -->
+    <section class="details-card">
+      <h2 class="card-title">📋 Website Technical Information</h2>
+      <table class="details-table">
+        <tbody>
+          <tr>
+            <th>Website Title</th>
+            <td>{{ analysis.title }}</td>
+          </tr>
+          <tr>
+            <th>Domain Host</th>
+            <td>{{ analysis.url_data.domain }}</td>
+          </tr>
+          <tr>
+            <th>HTTPS Enabled</th>
+            <td>{{ 'Yes (https://)' if analysis.url_data.is_https else 'No (http://)' }}</td>
+          </tr>
+          <tr>
+            <th>HTTP Status</th>
+            <td>{{ analysis.status_code if analysis.status_code else 'Connection Error' }}</td>
+          </tr>
+          <tr>
+            <th>Response Time</th>
+            <td>{{ analysis.response_time }} seconds</td>
+          </tr>
+          <tr>
+            <th>Redirect Count</th>
+            <td>{{ analysis.redirect_count }}</td>
+          </tr>
+          <tr>
+            <th>Total Links Count</th>
+            <td>{{ analysis.link_count }} links found</td>
+          </tr>
+          <tr>
+            <th>Total Forms Count</th>
+            <td>{{ analysis.form_count }} forms found</td>
+          </tr>
+          <tr>
+            <th>Password Input Field</th>
+            <td>{{ 'Detected' if analysis.has_password_field else 'None detected' }}</td>
+          </tr>
+          <tr>
+            <th>Server Banner</th>
+            <td>{{ analysis.server_info }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Trust Pages Check Section -->
+    <section class="details-card">
+      <h2 class="card-title">📄 Trust & Legal Page Links</h2>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+        Legitimate sites typically link to standard policy pages. Missing links are treated as minor signals and do not mean a website is fake.
+      </p>
+      <table class="details-table">
+        <tbody>
+          <tr>
+            <th>About Page</th>
+            <td style="color: {{ 'var(--color-trustworthy)' if analysis.trust_pages.about else 'var(--color-caution)' }};">
+              {{ '✓ Found' if analysis.trust_pages.about else '✕ Not Found' }}
+            </td>
+          </tr>
+          <tr>
+            <th>Contact Page</th>
+            <td style="color: {{ 'var(--color-trustworthy)' if analysis.trust_pages.contact else 'var(--color-caution)' }};">
+              {{ '✓ Found' if analysis.trust_pages.contact else '✕ Not Found' }}
+            </td>
+          </tr>
+          <tr>
+            <th>Privacy Policy</th>
+            <td style="color: {{ 'var(--color-trustworthy)' if analysis.trust_pages.privacy else 'var(--color-caution)' }};">
+              {{ '✓ Found' if analysis.trust_pages.privacy else '✕ Not Found' }}
+            </td>
+          </tr>
+          <tr>
+            <th>Terms of Service</th>
+            <td style="color: {{ 'var(--color-trustworthy)' if analysis.trust_pages.terms else 'var(--color-caution)' }};">
+              {{ '✓ Found' if analysis.trust_pages.terms else '✕ Not Found' }}
+            </td>
+          </tr>
+          <tr>
+            <th>Refund / Return Policy</th>
+            <td style="color: {{ 'var(--color-trustworthy)' if analysis.trust_pages.refund else 'var(--color-caution)' }};">
+              {{ '✓ Found' if analysis.trust_pages.refund else '✕ Not Found' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Action Buttons -->
+    <div class="actions-bar">
+      <a href="{{ url_for('download_report', filename=report_filename) }}" class="btn-primary">
+        📥 Download Report (.TXT)
+      </a>
+      <a href="{{ url_for('home') }}" class="btn-secondary">
+        🔄 Analyze Another Website
+      </a>
+      <a href="{{ url_for('history_page') }}" class="btn-secondary">
+        📜 View All Scan History
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>WebTrust – Educational Website Trust & Risk Analyzer | Built with Python, Flask, and Matplotlib</p>
+    </div>
+  </footer>
+
+</body>
+</html>

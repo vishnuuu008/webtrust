@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebTrust – Website Trust & Risk Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="brand-logo">
+        <span>🛡️ WebTrust</span>
+        <span class="brand-badge">Passive Trust Scanner</span>
+      </div>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link active">Home</a>
+        <a href="{{ url_for('how_it_works') }}" class="nav-link">How It Works</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link">Scan History</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="container">
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-pill">
+        <span>Passive & Safe Security Analysis</span>
+      </div>
+      <h1 class="hero-title">WebTrust</h1>
+      <h2 style="font-size: 1.5rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 12px;">Website Trust & Risk Analyzer</h2>
+      <p class="hero-subtitle">
+        Enter a website URL and check its basic trust and safety signals.
+      </p>
+
+      <!-- Display Flash Messages if any -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert-error">
+              <strong>Notice:</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Search Box (Pure HTML Form - Zero JavaScript) -->
+      <div class="search-card">
+        <form action="{{ url_for('analyze') }}" method="POST" class="search-form">
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              name="url" 
+              class="url-input" 
+              placeholder="Enter Website URL (e.g. https://example.com)" 
+              required
+              autofocus
+            >
+          </div>
+          <button type="submit" class="btn-primary">Analyze Website</button>
+        </form>
+
+        <!-- Example URLs for quick testing -->
+        <div class="example-urls">
+          <span>Examples to test:</span>
+          <span class="example-tag">https://example.com</span>
+          <span class="example-tag">https://python.org</span>
+          <span class="example-tag">http://192.168.1.1</span>
+        </div>
+      </div>
+
+      <!-- Educational Safety Disclaimer Notice -->
+      <div class="notice-box">
+        <div class="notice-icon">ℹ️</div>
+        <div>
+          <strong>Educational Notice:</strong> WebTrust provides an automated risk assessment based on available website signals. It does not guarantee that a website is genuine or fraudulent. All checks are strictly passive and safe.
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Overview -->
+    <section class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3 class="feature-title">HTTPS & SSL Check</h3>
+        <p class="feature-desc">Verifies if communication is encrypted and checks for SSL certificate validity.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3 class="feature-title">URL Structure Analysis</h3>
+        <p class="feature-desc">Checks for raw IP addresses, excessive subdomains, length, and suspicious patterns.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📜</div>
+        <h3 class="feature-title">Trust Pages Detection</h3>
+        <p class="feature-desc">Passively scans for links to Privacy Policy, About Us, Terms, and Contact pages.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Python Matplotlib Charts</h3>
+        <p class="feature-desc">Generates risk breakdown bar charts, signal distribution pie charts, and history trends.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>WebTrust – Educational Website Trust & Risk Analyzer | Built with Python, Flask, and Matplotlib</p>
+    </div>
+  </footer>
+
+</body>
+</html>

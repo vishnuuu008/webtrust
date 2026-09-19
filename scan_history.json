@@ -1,0 +1,50 @@
+[
+  {
+    "website": "example.com",
+    "risk_score": 15,
+    "result": "Likely Trustworthy",
+    "date": "2026-09-19 20:15:00"
+  },
+  {
+    "website": "python.org",
+    "risk_score": 10,
+    "result": "Likely Trustworthy",
+    "date": "2026-09-19 20:45:00"
+  },
+  {
+    "website": "suspicious-free-crypto-login.xyz",
+    "risk_score": 75,
+    "result": "High Risk Indicators",
+    "date": "2026-09-19 21:10:00"
+  },
+  {
+    "website": "create a beginner-friendly website project called \u201cwebtrust \u2013 website trust checker\u201d.  important",
+    "risk_score": 70,
+    "result": "High Risk Indicators",
+    "date": "2026-09-19 21:54:11"
+  },
+  {
+    "website": "amazon-login.example.com",
+    "risk_score": 50,
+    "result": "Needs Caution",
+    "date": "2026-09-19 21:55:05"
+  },
+  {
+    "website": "pixabay.com",
+    "risk_score": 30,
+    "result": "Needs Caution",
+    "date": "2026-09-19 21:55:51"
+  },
+  {
+    "website": "pixabay.com",
+    "risk_score": 30,
+    "result": "Needs Caution",
+    "date": "2026-09-19 21:57:31"
+  },
+  {
+    "website": "example.com",
+    "risk_score": 35,
+    "result": "Needs Caution",
+    "date": "2026-09-19 22:06:47"
+  }
+]
